@@ -1,4 +1,6 @@
-import { Router } from "express";
+import express from "express-promise-router";
+
+const router = express();
 
 import {
   createTodo,
@@ -6,8 +8,6 @@ import {
   deleteTodo,
   updateTodo,
 } from "../controllers/todos";
-
-const router = Router();
 
 router.route("/").get(getTodos).post(createTodo);
 router.route("/:id").patch(updateTodo).delete(deleteTodo);

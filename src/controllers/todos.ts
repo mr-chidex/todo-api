@@ -1,23 +1,27 @@
 import { RequestHandler } from "express";
+import mongoose from "mongoose";
+
 import { Todo } from "../models/todos";
 
 /**
  * @route POST /api/v1/todos
  * @desc add new task to do list
  */
-export const createTodo: RequestHandler = (req, res) => {
-  const todotext = (req.body as { text: string }).text;
+export const createTodo: RequestHandler = async (req, res) => {
+  const body = req.body as { text: string };
 
-  const newTodo = new Todo(todotext);
+  const todo = new Todo({ text: body.text });
 
-  res.status(201).json({ message: "created", cratedTodo: newTodo });
+  await todo.save();
+
+  res.status(201).json({ message: "created", todo });
 };
 
 /**
  * @route GET  /api/v1/todos
  * @desc get all todo task
  */
-export const getTodos: RequestHandler = async (req, res) => {
+export const getTodos: RequestHandler = async (_, res) => {
   const todos = await Todo.find();
   res.json({ todos });
 };
@@ -29,19 +33,27 @@ export const getTodos: RequestHandler = async (req, res) => {
 export const deleteTodo: RequestHandler<{ id: string }> = async (req, res) => {
   const { id } = req.params;
 
+  if (!mongoose.isValidObjectId(id))
+    return res.status(400).json({ message: "invalid todo id" });
+
   const todo = await Todo.findById(id);
 
   if (!todo) return res.status(400).json({ message: "todo with id not found" });
+
+  await Todo.deleteOne({ _id: id });
 
   res.json({ message: "deleted", status: "success", todo });
 };
 
 /**
- * @route PUT  /api/v1/todos/:id
+ * @route PATCH  /api/v1/todos/:id
  * @desc update todo task in do list
  */
 export const updateTodo: RequestHandler<{ id: string }> = async (req, res) => {
   const id = req.params.id;
+
+  if (!mongoose.isValidObjectId(id))
+    return res.status(400).json({ message: "invalid todo id" });
 
   const todo = await Todo.findById(id);
 
