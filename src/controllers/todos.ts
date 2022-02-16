@@ -1,45 +1,57 @@
 import { RequestHandler } from "express";
 import { Todo } from "../models/todos";
 
-const TODOS: Todo[] = [];
-
+/**
+ * @route POST /api/v1/todos
+ * @desc add new task to do list
+ */
 export const createTodo: RequestHandler = (req, res) => {
   const todotext = (req.body as { text: string }).text;
 
-  const newTodo = new Todo(Date.now().toString(), todotext);
-  TODOS.push(newTodo);
+  const newTodo = new Todo(todotext);
 
   res.status(201).json({ message: "created", cratedTodo: newTodo });
 };
 
-export const getTodos: RequestHandler = (req, res) => {
-  res.json({ todos: TODOS });
+/**
+ * @route GET  /api/v1/todos
+ * @desc get all todo task
+ */
+export const getTodos: RequestHandler = async (req, res) => {
+  const todos = await Todo.find();
+  res.json({ todos });
 };
 
-export const deleteTodo: RequestHandler<{ id: string }> = (req, res) => {
-  const id = req.params.id;
+/**
+ * @route DELETE  /api/v1/todos/:id
+ * @desc delete todo task from do list
+ */
+export const deleteTodo: RequestHandler<{ id: string }> = async (req, res) => {
+  const { id } = req.params;
 
-  const todoIndex = TODOS.findIndex((todo) => todo.id === id);
+  const todo = await Todo.findById(id);
 
-  if (todoIndex < 0) throw new Error("could not find todo with id");
+  if (!todo) return res.status(400).json({ message: "todo with id not found" });
 
-  TODOS.splice(todoIndex, 1);
-
-  res.json({ message: "deleted", status: "success", todos: TODOS });
+  res.json({ message: "deleted", status: "success", todo });
 };
 
-export const updateTodo: RequestHandler<{ id: string }> = (req, res) => {
+/**
+ * @route PUT  /api/v1/todos/:id
+ * @desc update todo task in do list
+ */
+export const updateTodo: RequestHandler<{ id: string }> = async (req, res) => {
   const id = req.params.id;
 
-  const todoIndex = TODOS.findIndex((todo) => todo.id === id);
+  const todo = await Todo.findById(id);
 
-  if (todoIndex < 0) throw new Error("could not find todo with id");
+  if (!todo) return res.status(400).json({ message: "todo with id not found" });
 
-  const newUpdate = (req.body as { text: string }).text;
+  const body = req.body as { text: string };
 
-  const updatedTodo = new Todo(id, newUpdate);
+  todo.text = body.text || todo.text;
 
-  TODOS[todoIndex] = updatedTodo;
+  await todo.save();
 
-  res.json({ message: "updated", updatedTodo });
+  res.json({ message: "updated", todo });
 };
