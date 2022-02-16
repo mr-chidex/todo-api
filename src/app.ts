@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import todos from "./routes/todos";
 
 const app: Application = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 dotenv.config();
 
 app.use(express.json());
