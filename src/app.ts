@@ -7,12 +7,10 @@ import todos from "./routes/todos";
 
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
+dotenv.config();
 
 app.use(express.json());
-if (process.env.NODE_ENV !== "production") {
-  app.use(morgan("dev"));
-  dotenv.config();
-}
+app.use(morgan("dev"));
 
 app.use("/todos", todos);
 
