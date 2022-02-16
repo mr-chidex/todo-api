@@ -5,12 +5,14 @@ import dotenv from "dotenv";
 
 import todos from "./routes/todos";
 
-dotenv.config();
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
-app.use(morgan("dev"));
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
+  dotenv.config();
+}
 
 app.use("/todos", todos);
 
