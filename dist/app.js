@@ -14,13 +14,13 @@ dotenv_1.default.config();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, morgan_1.default)("dev"));
-app.use("/todos", todos_1.default);
+app.use("/api/v1/todos", todos_1.default);
 app.use("/", (_, res) => {
     res.json({
         success: true,
         name: "mr-chidex",
         github: "github.com/mr-chidex",
-        route: "/todos",
+        route: "/api/v1/todos",
     });
 });
 app.use((err, _, res, __) => {

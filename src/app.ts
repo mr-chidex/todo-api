@@ -13,14 +13,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-app.use("/todos", todos);
+app.use("/api/v1/todos", todos);
 
 app.use("/", (_: Request, res: Response) => {
   res.json({
     success: true,
     name: "mr-chidex",
     github: "github.com/mr-chidex",
-    route: "/todos",
+    route: "/api/v1/todos",
   });
 });
 
